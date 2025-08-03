@@ -1,6 +1,21 @@
 --!strict
 -- uro ;)
 
+-- UI
+-- Contains methods to create and control the surface guis on the keyboard keys.
+
+-- NAME           Return type   Description
+-- UpdateKeyGui   void          Updates all SurfaceGuis on keys based on paramaters
+
+---use_uppercase  boolean       If the UPPERCASE key is on: make all keys show uppercase 
+---use_shift      boolean       If the SHIFT key is on: make all keys uppercase, use `swap_table` to swap keys for SHIFT variants
+---swap_table     { \/ }        Which keys to swap for what while the SHIFT key is on
+---               {[string]: string}
+
+
+-- CreateKeyGui   TextLabel     Creates a KeyGui for a specific Key (BasePart)  
+---Key            BasePart      Key to create KeyGui into and use Name to get KeyData.Key from
+
 local uiModule = {}
 local types = require(script.Parent.types)
 

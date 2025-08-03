@@ -1,4 +1,14 @@
--- Creates user Gui
+--!strict
+-- uro ;)
+
+-- PlayerUi
+-- Contains methods to create and control the player's UI including the Feedback UI and Current selected key UI.
+
+-- module:Setup - 
+----------------- Sets up PlayerAdded listener to create player ui
+
+-- GetIsUsingTypingUi - Returns true if createTypingView from module:Setup was true with a valid typingViewName
+-- GetTypingUiName    - Returns given typingViewName from module:Setup if createTypingView from module:Setup was true with a valid typingViewName
 
 local Players = game:GetService("Players")
 

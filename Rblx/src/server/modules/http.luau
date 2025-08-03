@@ -1,3 +1,19 @@
+--!strict
+-- uro ;)
+
+-- Http
+-- Contains methods to send data towards the python server and check if the server is up.
+
+-- module:Start - :: Record (types.Record)
+----------------- Starts sending info based on Record to the server to press keys.
+
+-- module:Test - :: URL (string)
+---------------- Sends a request to url .. "online" to check if the server is online.
+---------------- URL: must include ending / e.g. http://localhost:5000/
+
+-- module:SetupEditables - :: Editables (types.Editable)
+-------------------------- Edits more settings such as typing playback speed. View more info in the `types` module.
+
 local module = {}
 local types = require(script.Parent.types)
 
@@ -25,12 +41,14 @@ local function AttemptHTTP(data: string)
 end
 
 local function RunHTTP(key: string): boolean
-  local data = httpService:JSONEncode({
+  local data: types.HTTPSendData = {
     ["req"] = "PressKey",
     ["key"] = key
-  })
+  }
   
-  return AttemptHTTP(data)
+  local strdata = httpService:JSONEncode(data)
+  
+  return AttemptHTTP(strdata)
 end
 
 local function RecordHolder(record: types.Record)

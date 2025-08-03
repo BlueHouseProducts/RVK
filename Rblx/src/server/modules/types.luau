@@ -1,6 +1,9 @@
 --!strict
 -- uro ;)
 
+-- Types
+-- Contains types used throughout the project.
+
 local types = {}
 
 export type KeyList = {
@@ -24,5 +27,14 @@ type UseTypeSpeedDivision = {
 export type Editable = {
   ["UseTypeSpeedDivision"]: UseTypeSpeedDivision
 }
+
+export type HTTPSendData = {
+  ["req"]: "PressKey",
+  ["key"]: string
+}
+
+export type ValidHTTPReceiveData = {
+  ["result"]: boolean
+} -- unused type, stringified on receive
 
 return types

@@ -1,6 +1,9 @@
 --!strict
 -- uro ;)
 
+-- Main
+-- Puts all other modules together, and also has the core key pressing and animation functionality.
+
 local Collection = game:GetService("CollectionService")
 
 local main = {}
@@ -25,6 +28,9 @@ local UI_LABEL_NAME: string = "Label"
 local IsUsingTypingUi: boolean = false
 local TypingUi: string? = nil;
 local plruifr = require(script.Parent.plrui)
+
+local using_audio: boolean = false
+local audio_id: string? = nil
 
 local function EditUi(key: string, plr: Player, toGreyOut: boolean)		
 	if not TypingUi then
@@ -132,6 +138,19 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 	detector.MouseClick:Connect(function(playerWhoClicked: Player) 
 		task.spawn(function() 
 			soundPlayEvent:FireClient(playerWhoClicked);
+
+			if audio_id and using_audio then
+				local Sound = Instance.new("Sound")
+				Sound.Parent = workspace
+				Sound.Name = "KeyPressAudio"
+				Sound.SoundId = audio_id
+				Sound.Volume = 2
+				Sound:Play()
+
+				Sound.Ended:Connect(function()  
+					Sound:Destroy()
+				end)
+			end
 
 			if Key.Name ~= "UPPERCASE" and Key.Name ~= "SHIFT" then 
 				Key.BrickColor = BrickColor.new("Pastel green") 
@@ -262,7 +281,7 @@ local function listenSwitchPress(switch: BasePart, plr: Player)
   end
 end
 
-function main:Start(key_tag: string, playSoundEvent: RemoteEvent, playerUiName: string, swapTable: {[string]: string}, listenSwitch: BasePart, given_url: string)
+function main:Start(key_tag: string, playSoundEvent: RemoteEvent, playerUiName: string, swapTable: {[string]: string}, listenSwitch: BasePart, given_url: string, key_sound_id: string?)
   local Keys = Collection:GetTagged(key_tag) :: types.KeyList
   
   url = given_url
@@ -285,6 +304,11 @@ function main:Start(key_tag: string, playSoundEvent: RemoteEvent, playerUiName: 
 	if plruifr.GetIsUsingTypingUi() then		
 		IsUsingTypingUi = true
 		TypingUi = plruifr.GetTypingUiName()
+	end
+
+	if key_sound_id then
+		using_audio = true
+		audio_id = key_sound_id
 	end
 end
 
