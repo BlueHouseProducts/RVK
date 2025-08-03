@@ -5,7 +5,7 @@ local main = require(script.modules.main) -- module that controls everything
 
 -- Edit these if you need!!
 local KeyTag: string = "Key" -- Tag all keys have, keys can also have the tag NoSwap to prevent them from swapping when <shift> is pressed
-local PlaySoundInstance: RemoteEvent = ReplicatedStorage.PlaySound
+local PlaySoundInstance: RemoteEvent = ReplicatedStorage.PlaySound -- this event is fired whenever a key is pressed.
 local NameOfPlayerUi: string = "PlayerUi"
 local ToggleSwitch: BasePart = workspace.Main.keyboard.Switch
 
