@@ -1,11 +1,14 @@
+--!strict
+-- uro ;)
+
 local uiModule = {}
-local CS = game:GetService("CollectionService")
+local types = require(script.Parent.types)
 
 local tag_name = ""
-local Keys = {}
+local Keys: types.KeyList? = {}
 
-function uiModule:Start(tag: string)
-  Keys = CS:GetTagged(tag)
+function uiModule:Start(KeysGiven)
+  Keys = KeysGiven
 end
 
 function uiModule:UpdateKeyGui(use_uppercase: boolean, use_shift: boolean, swap_table)
@@ -47,12 +50,26 @@ function uiModule:UpdateKeyGui(use_uppercase: boolean, use_shift: boolean, swap_
 	end
 end
 
-function uiModule:CreateKeyGui()
-  if not Keys then return end
-  
-  for _, Key in ipairs(Keys) do
-    print(Key.Name)
-  end
+function uiModule:CreateKeyGui(Key: BasePart): TextLabel
+  local r = Instance.new("SurfaceGui")
+	r.Face = Enum.NormalId.Top
+	r.AlwaysOnTop = true
+	r.Parent = Key
+	
+	r.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+	r.PixelsPerStud = 50
+	
+	local t = Instance.new("TextLabel")
+	t.Size = UDim2.fromScale(1, 1)
+	t.Text = Key.Name
+	t.BackgroundTransparency = 1
+	t.Parent = r
+	t.TextColor3 = Color3.new(1, 1, 1)
+	t.TextScaled = true
+
+  t.Text = Key.Name
+
+  return t
 end
 
 return uiModule
