@@ -16,4 +16,13 @@ export type Record = {
   ["Time"]: number
 }
 
+type UseTypeSpeedDivision = {
+  ["Enabled"]: true,
+  ["DivisionSpeed"]: number
+} | { ["Enabled"]: false }
+
+export type Editable = {
+  ["UseTypeSpeedDivision"]: UseTypeSpeedDivision
+}
+
 return types

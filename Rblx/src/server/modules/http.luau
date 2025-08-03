@@ -4,7 +4,12 @@ local types = require(script.Parent.types)
 local httpService = game:GetService("HttpService")
 
 local url = "";
-local testAddition = "online"
+
+local Editables: types.Editable = {
+	["UseTypeSpeedDivision"] = {
+		["Enabled"] = false
+	}
+}
 
 local function AttemptHTTP(data: string)
   local success, res = pcall(function()  
@@ -29,7 +34,9 @@ local function RunHTTP(key: string): boolean
 end
 
 local function RecordHolder(record: types.Record)
-  task.wait(record.Time)
+  local realTime = if Editables.UseTypeSpeedDivision.Enabled then record.Time / Editables.UseTypeSpeedDivision.DivisionSpeed else record.Time
+  
+  task.wait(realTime)
   return RunHTTP(record.Key)
 end
 
@@ -49,18 +56,22 @@ function module:Start(recording: types.Recording, given_url: string)
   end
 end
 
-function module:Test(): boolean
-  if not url then return false end
-  if url == "" then return false end
+function module:Test(given_url: string): boolean
+  if not given_url then return false end
+  if given_url == "" then return false end
 
-  local fullurl = url .. testAddition
+  local fullurl = given_url .. "online"
 
   local success = pcall(function()  
-    httpService:PostAsync(fullurl)
+    httpService:GetAsync(fullurl)
     return true
   end)
 
   return success
+end
+
+function module:SetupEditables(editables: types.Editable)
+  Editables = editables
 end
 
 return module

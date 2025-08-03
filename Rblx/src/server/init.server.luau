@@ -35,5 +35,21 @@ local ShiftSwapTable: {[string]: string} = {
 	["'"] = "@"
 }
 
-plrui:Setup(NameOfPlayerUi)
+-- You can create a ui of what you have typed on the keyboard with setting to true:
+local CreateTypingView: boolean = false
+local TypingViewGuiName: string = "CurrentTextGui"
+
+plrui:Setup(NameOfPlayerUi, CreateTypingView, TypingViewGuiName)
+
+-- You can edit some more typing variables using the http:SetupEditables(editables: types.Editable) function. e.g. :
+-- local http = require(script.modules.http)
+-- local types = require(script.modules.types)
+-- local editables: types.Editable = {
+-- 	["UseTypeSpeedDivision"] = {
+--		["Enabled"] = true,
+--		["DivisionSpeed"] = 3
+-- 	}
+-- } -- makes your resulting typing speed faster by dividing all wait times by 3
+-- http:SetupEditables(editables)
+
 main:Start(KeyTag, PlaySoundInstance, NameOfPlayerUi, ShiftSwapTable, ToggleSwitch, HostUrl)

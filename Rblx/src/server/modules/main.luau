@@ -22,6 +22,78 @@ local url: string? = nil
 
 local UI_LABEL_NAME: string = "Label"
 
+local IsUsingTypingUi: boolean = false
+local TypingUi: string? = nil;
+local plruifr = require(script.Parent.plrui)
+
+local function EditUi(key: string, plr: Player, toGreyOut: boolean)		
+	if not TypingUi then
+		IsUsingTypingUi = false
+		return
+	end
+
+	local ui = plr.PlayerGui:FindFirstChild(TypingUi)
+
+	if (not ui) or (not ui:IsA("ScreenGui")) then
+		IsUsingTypingUi = false
+		return
+	end
+
+	local label = ui:FindFirstChild(UI_LABEL_NAME)
+
+	if (not label) or (not label:IsA("TextLabel")) then
+		IsUsingTypingUi = false
+		return
+	end
+
+	local lower_key = key:lower()
+
+	local old_str = label.Text
+	local new_str = ""
+
+	if lower_key == "<backspace>" then
+		new_str = string.sub(old_str, 1, #old_str - 1)
+	elseif lower_key == "<return>" then
+		new_str = old_str .. "\n"
+		label.TextXAlignment = Enum.TextXAlignment.Left
+	elseif lower_key == "<space>" then
+		new_str = old_str .. " "
+	else
+		new_str = old_str .. key
+	end
+
+	label.Text = new_str
+
+	if toGreyOut then
+		label.TextColor3 = Color3.new(0.3, 0.3, 0.3)
+	else
+		label.TextColor3 = Color3.new(0, 0, 0)
+	end
+end
+
+local function ClearUi(plr: Player)
+	if not TypingUi then
+		IsUsingTypingUi = false
+		return
+	end
+
+	local ui = plr.PlayerGui:FindFirstChild(TypingUi)
+
+	if (not ui) or (not ui:IsA("ScreenGui")) then
+		IsUsingTypingUi = false
+		return
+	end
+
+	local label = ui:FindFirstChild(UI_LABEL_NAME)
+
+	if (not label) or (not label:IsA("TextLabel")) then
+		IsUsingTypingUi = false
+		return
+	end
+
+	label.Text = ""
+end
+
 local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlight, t: TextLabel, playerUiName: string, soundPlayEvent: RemoteEvent)
   detector.MouseHoverEnter:Connect(function(playerWhoClicked: Player) 
     h.Enabled = true
@@ -111,12 +183,16 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 			
 			return
 		end
-		
-		if not enabled then return end
-		if not recording then return end
-		if not start_time then return end
-		
+
 		local k: string = Key.Name
+
+		if IsUsingTypingUi and (not enabled or not recording) then
+			EditUi(if use_uppercase or use_shift then k:upper() else k:lower(), playerWhoClicked, true)
+		end
+		
+		if not start_time then return end
+		if not recording then return end
+		if not enabled then return end
 
     if not record then
       record = {} 
@@ -126,6 +202,10 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 			["Key"] = if use_uppercase or use_shift then k:upper() else k:lower(),
 			["Time"] = time() - start_time
 		});
+
+		if IsUsingTypingUi then
+			EditUi(if use_uppercase or use_shift then k:upper() else k:lower(), playerWhoClicked, false)
+		end
 	end)
 end
 
@@ -148,8 +228,9 @@ local function SetupKeys(keys: types.KeyList, playerUiName: string, playSoundEve
   end
 end
 
-local function listenSwitchPress(switch: BasePart)
+local function listenSwitchPress(switch: BasePart, plr: Player)
   recording = not recording
+	ClearUi(plr)
 
   if recording then
     switch.BrickColor = BrickColor.new("Really red")
@@ -160,18 +241,18 @@ local function listenSwitchPress(switch: BasePart)
 
     enabled = false
 
-		local isOnline: boolean = htService:Test()
-
 		if not url then
 			warn("No url was given for the server address. Defaulting to http://localhost:5000")
 		end
+
+		local isOnline: boolean = htService:Test(url or "http://localhost:5000/")
     
     if record and isOnline then
-			htService:Start(record, url or "http://localhost:5000")
+			htService:Start(record, url or "http://localhost:5000/")
     end
 
 		if not isOnline then
-			warn("Keyboard playback did not start as the server is not up on " .. (url or "http://localhost:5000"))
+			warn("Keyboard playback did not start as the server is not up on " .. (url or "http://localhost:5000 (default url)"))
 		end
 
     record = {}
@@ -197,9 +278,14 @@ function main:Start(key_tag: string, playSoundEvent: RemoteEvent, playerUiName: 
 
   uiService:UpdateKeyGui(use_uppercase, use_shift, swapTable)
 
-  listenDetector.MouseClick:Connect(function()  
-    listenSwitchPress(listenSwitch)
+  listenDetector.MouseClick:Connect(function(p: Player)  
+    listenSwitchPress(listenSwitch, p)
   end)
+
+	if plruifr.GetIsUsingTypingUi() then		
+		IsUsingTypingUi = true
+		TypingUi = plruifr.GetTypingUiName()
+	end
 end
 
 return main
