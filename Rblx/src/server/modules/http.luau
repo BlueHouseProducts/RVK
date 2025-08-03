@@ -7,7 +7,7 @@ local url = "";
 
 local function AttemptHTTP(data: string)
   local success, res = pcall(function()  
-    httpService:PostAsync(url, data)
+    httpService:PostAsync(url .. "useKey", data)
     return true
   end)
 
