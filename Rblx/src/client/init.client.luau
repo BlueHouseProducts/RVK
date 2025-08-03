@@ -4,15 +4,19 @@
 -- Plays the keyboard press sound when a key is pressed.
 
 local event: RemoteEvent = game:GetService("ReplicatedStorage").PlaySound
-local sound: Sound = workspace.Main.keyboard.keyPress
-
 local SoundUrl: string = "rbxassetid://18998603679"
 
-if (not sound.SoundId) or (sound.SoundId == "" )then
-  sound.SoundId = SoundUrl
+local function playSound()
+	local newSound = Instance.new("Sound")
+  newSound.SoundId = SoundUrl
+	newSound.Parent = script.Parent
+	newSound:Play()
+  newSound.Volume = 2
+	
+	newSound.Ended:Connect(function()
+		newSound:Destroy()
+	end)
 end
 
-event.OnClientEvent:Connect(function()  
-  sound:Play()
-end)
+event.OnClientEvent:Connect(playSound)
 
