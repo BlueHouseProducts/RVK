@@ -1,6 +1,7 @@
 # RVK
 # Made by BlueHouseProducts - Uro256
 # https://github.com/BlueHouseProducts/RVK/
+# License: https://github.com/BlueHouseProducts/RVK/blob/main/LICENSE
 
 from flask import Flask, request
 import keyboard
