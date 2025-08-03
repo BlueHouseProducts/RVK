@@ -17,10 +17,20 @@
       }
     },
 
+    "ReplicatedStorage": {
+      "$path": "src/shared"
+    },
+
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true
       },
+
+      "Main": {
+        "$className": "Model",
+        "$path": "src/model/"
+      },
+
       "Baseplate": {
         "$className": "Part",
         "$properties": {
@@ -44,6 +54,7 @@
         }
       }
     },
+
     "Lighting": {
       "$properties": {
         "Ambient": [
