@@ -159,10 +159,20 @@ local function listenSwitchPress(switch: BasePart)
     switch.BrickColor = BrickColor.new("Lime green")
 
     enabled = false
+
+		local isOnline: boolean = htService:Test()
+
+		if not url then
+			warn("No url was given for the server address. Defaulting to http://localhost:5000")
+		end
     
-    if record and url then
-      htService:Start(record, url)
+    if record and isOnline then
+			htService:Start(record, url or "http://localhost:5000")
     end
+
+		if not isOnline then
+			warn("Keyboard playback did not start as the server is not up on " .. (url or "http://localhost:5000"))
+		end
 
     record = {}
     start_time = nil

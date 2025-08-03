@@ -10,6 +10,8 @@ local PlaySoundInstance: RemoteEvent = ReplicatedStorage.PlaySound -- this event
 local NameOfPlayerUi: string = "PlayerUi" -- Name of created PlayerUi (what players see on their screen that shows current hovered item)
 local ToggleSwitch: BasePart = workspace.Main.keyboard.Switch
 
+-- you can edit the sound played in StarterPlayerScripts>Client
+
 local HostUrl: string = "http://localhost:5000/" -- include a / at the end, point it to the root of the site, not a page.
 
 local ShiftSwapTable: {[string]: string} = {

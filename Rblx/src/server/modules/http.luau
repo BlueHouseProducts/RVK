@@ -4,6 +4,7 @@ local types = require(script.Parent.types)
 local httpService = game:GetService("HttpService")
 
 local url = "";
+local testAddition = "online"
 
 local function AttemptHTTP(data: string)
   local success, res = pcall(function()  
@@ -46,6 +47,20 @@ function module:Start(recording: types.Recording, given_url: string)
       end
     end)
   end
+end
+
+function module:Test(): boolean
+  if not url then return false end
+  if url == "" then return false end
+
+  local fullurl = url .. testAddition
+
+  local success = pcall(function()  
+    httpService:PostAsync(fullurl)
+    return true
+  end)
+
+  return success
 end
 
 return module

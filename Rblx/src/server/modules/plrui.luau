@@ -17,6 +17,7 @@ local function CreateGui(Player: Player, UiName: string)
   label.Position = UDim2.fromScale(0, 1)
   label.Size = UDim2.fromOffset(333, 121)
   label.Text = ""
+  label.TextScaled = true
 end
 
 
