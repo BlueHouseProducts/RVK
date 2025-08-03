@@ -20,6 +20,8 @@ local swap_table: {[string]: string}? = nil
 
 local url: string? = nil
 
+local UI_LABEL_NAME: string = "Label"
+
 local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlight, t: TextLabel, playerUiName: string, soundPlayEvent: RemoteEvent)
   detector.MouseHoverEnter:Connect(function(playerWhoClicked: Player) 
     h.Enabled = true
@@ -33,7 +35,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
     local ui = playerWhoClicked.PlayerGui:FindFirstChild(playerUiName)
     if not ui or not ui:IsA("ScreenGui") then return end
 
-    local label = ui:FindFirstChild("Label")
+    local label = ui:FindFirstChild(UI_LABEL_NAME)
     if not label or not label:IsA("TextLabel") then return end
     label.Text = if use_uppercase then Key.Name:upper() else Key.Name:lower()
 	end)
@@ -50,7 +52,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
     local ui = playerWhoClicked.PlayerGui:FindFirstChild(playerUiName)
     if not ui or not ui:IsA("ScreenGui") then return end
 
-    local label = ui:FindFirstChild("Label")
+    local label = ui:FindFirstChild(UI_LABEL_NAME)
     if not label or not label:IsA("TextLabel") then return end
     label.Text = if use_uppercase then Key.Name:upper() else Key.Name:lower()
 	end)
@@ -78,7 +80,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 			return
 		end
 		
-		if (Key.Name :: string) == "UPPERCASE" then
+		if Key.Name == "UPPERCASE" then
 			use_uppercase = not use_uppercase
 
 			if use_uppercase then
@@ -105,7 +107,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 				Key.BrickColor = BrickColor.new("Persimmon")
 			end
 			
-			uiService:UpdateKeyGui(use_uppercase, use_shift, swap_table)
+			uiService:UpdateKeyGui(use_uppercase, use_shift, swap_table :: {[string]: string})
 			
 			return
 		end
@@ -128,7 +130,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 end
 
 local function SetupKeys(keys: types.KeyList, playerUiName: string, playSoundEvent: RemoteEvent)
-  for _, Key in ipairs(keys) do
+  for _, Key in pairs(keys) do
     if not Key:IsA("BasePart") then continue end
     
     local h: Highlight = Instance.new("Highlight")
@@ -146,12 +148,16 @@ local function SetupKeys(keys: types.KeyList, playerUiName: string, playSoundEve
   end
 end
 
-local function listenSwitchPress()
+local function listenSwitchPress(switch: BasePart)
   recording = not recording
 
   if recording then
+    switch.BrickColor = BrickColor.new("Really red")
+    
     start_time = time()
   else
+    switch.BrickColor = BrickColor.new("Lime green")
+
     enabled = false
     
     if record and url then
@@ -166,7 +172,7 @@ local function listenSwitchPress()
 end
 
 function main:Start(key_tag: string, playSoundEvent: RemoteEvent, playerUiName: string, swapTable: {[string]: string}, listenSwitch: BasePart, given_url: string)
-  local Keys: types.KeyList = Collection:GetTagged(key_tag)
+  local Keys = Collection:GetTagged(key_tag) :: types.KeyList
   
   url = given_url
 
@@ -179,8 +185,10 @@ function main:Start(key_tag: string, playSoundEvent: RemoteEvent, playerUiName: 
   local listenDetector = Instance.new("ClickDetector")
   listenDetector.Parent = listenSwitch
 
+  uiService:UpdateKeyGui(use_uppercase, use_shift, swapTable)
+
   listenDetector.MouseClick:Connect(function()  
-    listenSwitchPress()
+    listenSwitchPress(listenSwitch)
   end)
 end
 

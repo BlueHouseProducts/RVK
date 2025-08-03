@@ -9,3 +9,4 @@ local sound: Sound = workspace.Main.keyboard.keyPress
 event.OnClientEvent:Connect(function()  
   sound:Play()
 end)
+

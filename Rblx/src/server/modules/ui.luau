@@ -4,24 +4,25 @@
 local uiModule = {}
 local types = require(script.Parent.types)
 
-local tag_name = ""
 local Keys: types.KeyList? = {}
 
 function uiModule:Start(KeysGiven)
   Keys = KeysGiven
 end
 
-function uiModule:UpdateKeyGui(use_uppercase: boolean, use_shift: boolean, swap_table)
+function uiModule:UpdateKeyGui(use_uppercase: boolean, use_shift: boolean, swap_table: {[string]: string})
   local KeySwapTable = swap_table
 
   if not Keys then return end
   
-  for _, Key in ipairs(game:GetService("CollectionService"):GetTagged(tag_name)) do
-    if Key:IsA("BasePart") and Key:HasTag("NoSwap") then
+  for _, Key in pairs(Keys) do
+    if Key:IsA("BasePart") and not Key:HasTag("NoSwap") then
       local ui = Key:FindFirstChild("SurfaceGui")
+      if not ui then continue end
+
       local tl = ui:FindFirstChild("TextLabel")
       
-      if ui and tl and ui:IsA("SurfaceGui") and tl:IsA("TextLabel") then
+      if tl and ui:IsA("SurfaceGui") and tl:IsA("TextLabel") then
         local K = Key :: BasePart;
         if K.Name == "SHIFT" or K.Name == "UPPERCASE" then continue end
         
