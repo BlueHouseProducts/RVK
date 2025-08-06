@@ -25,13 +25,12 @@ local Editables: types.Editable = {
 	["UseTypeSpeedDivision"] = {
 		["Enabled"] = false
 	},
-  ["Debug"] = {
-    ["Enabled"] = false
-  }
+  ["Debug"] = false,
+  ["Delay"] = 2
 }
 
 local function AttemptHTTP(data: string)
-  if Editables.Debug.Enabled then
+  if Editables.Debug then
     print("Sending: " .. data)
   end
   
@@ -65,8 +64,8 @@ local function RecordHolder(record: types.Record)
   return RunHTTP(record.Key)
 end
 
-function module:Start(recording: types.Recording, given_url: string, delay: number | nil)
-  if Editables.Debug.Enabled then
+function module:Start(recording: types.Recording, given_url: string)
+  if Editables.Debug then
     print("Starting HTTP module with URL: " .. tostring(given_url))
     print("Delay: " .. tostring(delay))
     print("Recording: #" .. tostring(#recording), recording)
@@ -75,7 +74,7 @@ function module:Start(recording: types.Recording, given_url: string, delay: numb
   
   url = given_url
 
-  task.wait(delay or 1)
+  task.wait(Editables.Delay or 0)
   
   for i, record in pairs(recording) do
     task.spawn(function() 

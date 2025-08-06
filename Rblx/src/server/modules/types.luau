@@ -24,13 +24,11 @@ type UseTypeSpeedDivision = {
   ["DivisionSpeed"]: number
 } | { ["Enabled"]: false }
 
-type UseDebug = {
-  ["Enabled"]: boolean,
-}
 
 export type Editable = {
   ["UseTypeSpeedDivision"]: UseTypeSpeedDivision,
-  ["Debug"]: UseDebug
+  ["Debug"]: boolean?,
+  ["Delay"]: number?
 }
 
 export type HTTPSendData = {
