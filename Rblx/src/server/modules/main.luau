@@ -207,7 +207,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 
       if not swap_table then return end
 
-			if use_uppercase then
+			if use_shift then
 				for _, NewKey in ipairs(uppercase_keys) do
 					if NewKey.Name == "SHIFT" then
 						if NewKey:IsA("BasePart") then
@@ -231,9 +231,16 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 		end
 
 		local k: string = Key.Name
+		local temp_uppercase: boolean = use_shift
+
+		if string.match(k, "%w+") and use_shift then
+			use_shift = false
+			temp_uppercase = true
+			uiService:UpdateKeyGui(false, false, swap_table :: {[string]: string})
+		end
 
 		if IsUsingTypingUi and (not enabled or not recording) then
-			EditUi(if use_uppercase or use_shift then k:upper() else k:lower(), playerWhoClicked, true)
+			EditUi(if use_uppercase or use_shift or temp_uppercase then k:upper() else k:lower(), playerWhoClicked, true)
 		end
 		
 		if not start_time then return end
@@ -245,7 +252,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
     end
 		
 		table.insert(record :: types.Recording, {
-			["Key"] = if use_uppercase or use_shift then k:upper() else k:lower(),
+			["Key"] = if use_uppercase or use_shift or temp_uppercase then k:upper() else k:lower(),
 			["Time"] = time() - start_time
 		});
 
