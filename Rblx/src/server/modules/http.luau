@@ -24,10 +24,17 @@ local url = "";
 local Editables: types.Editable = {
 	["UseTypeSpeedDivision"] = {
 		["Enabled"] = false
-	}
+	},
+  ["Debug"] = {
+    ["Enabled"] = false
+  }
 }
 
 local function AttemptHTTP(data: string)
+  if Editables.Debug.Enabled then
+    print("Sending: " .. data)
+  end
+  
   local success, res = pcall(function()  
     httpService:PostAsync(url .. "useKey", data)
     return true
@@ -59,6 +66,13 @@ local function RecordHolder(record: types.Record)
 end
 
 function module:Start(recording: types.Recording, given_url: string, delay: number | nil)
+  if Editables.Debug.Enabled then
+    print("Starting HTTP module with URL: " .. tostring(given_url))
+    print("Delay: " .. tostring(delay))
+    print("Recording: #" .. tostring(#recording), recording)
+    print("Editables: ", Editables)
+  end
+  
   url = given_url
 
   task.wait(delay or 1)
