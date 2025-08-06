@@ -58,8 +58,10 @@ local function RecordHolder(record: types.Record)
   return RunHTTP(record.Key)
 end
 
-function module:Start(recording: types.Recording, given_url: string)
+function module:Start(recording: types.Recording, given_url: string, delay: number | nil)
   url = given_url
+
+  task.wait(delay or 1)
   
   for i, record in pairs(recording) do
     task.spawn(function() 
