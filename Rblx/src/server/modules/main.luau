@@ -13,6 +13,7 @@ local types = require(script.Parent.types)
 
 local use_uppercase = false
 local use_shift = false
+local use_ctrl = false
 
 local enabled = true
 local recording = false
@@ -34,6 +35,10 @@ local audio_id: string? = nil
 
 local uppercase_keys: {BasePart} = {}
 local shift_keys: {BasePart} = {}
+local ctrl_keys: {BasePart} = {}
+
+local current_ctrl_text: string? = nil
+local blue_keys: {BasePart} = {}
 
 local function EditUi(key: string, plr: Player, toGreyOut: boolean)		
 	if not TypingUi then
@@ -61,7 +66,12 @@ local function EditUi(key: string, plr: Player, toGreyOut: boolean)
 	local new_str = ""
 
 	if lower_key == "<backspace>" then
-		new_str = string.sub(old_str, 1, #old_str - 1)
+		local lastChar = string.sub(old_str, -1)
+		if lastChar == ">" then 
+			new_str = old_str .. "<~backspace ~>"
+		else
+			new_str = string.sub(old_str, 1, #old_str - 1)
+		end
 	elseif lower_key == "<return>" then
 		new_str = old_str .. "\n"
 		label.TextXAlignment = Enum.TextXAlignment.Left
@@ -109,6 +119,8 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 		
 		if Key.Name == "UPPERCASE" then return end
 		if Key.Name == "SHIFT" then return end
+		if Key.Name == "CTRL" then return end
+		if Key:HasTag("CtrlPressed") then return end
 		
 		(Key :: BasePart).BrickColor = BrickColor.new("Pearl")	
 		t.TextColor3 = Color3.new(0, 0, 0)
@@ -126,6 +138,13 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 		
 		if Key.Name == "UPPERCASE" then return end
 		if Key.Name == "SHIFT" then return end
+		if Key.Name == "CTRL" then return end
+		if Key:HasTag("CtrlPressed") then return end
+
+		if Key:HasTag("CtrlPressed") then
+			Key.BrickColor = BrickColor.new("Electric blue")
+			return
+		end
 		
 		(Key :: BasePart).BrickColor = BrickColor.new("Black")
 		t.TextColor3 = Color3.new(1, 1, 1)
@@ -155,16 +174,28 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 				end)
 			end
 
-			if Key.Name ~= "UPPERCASE" and Key.Name ~= "SHIFT" then 
-				Key.BrickColor = BrickColor.new("Pastel green") 
+			if Key.Name ~= "UPPERCASE" and Key.Name ~= "CTRL" then 
+				if Key:HasTag("CtrlPressed") then
+					Key.BrickColor = BrickColor.new("Medium blue")
+				else
+					if Key.Name ~= "SHIFT" then
+						Key.BrickColor = BrickColor.new("Pastel green") 
+					end
+				end
 			end
 			
 			Key.Position = Vector3.new(Key.Position.X, Key.Position.Y - 0.5, Key.Position.Z)
 			
 			task.wait(0.2);
 			
-			if Key.Name ~= "UPPERCASE" and Key.Name ~= "SHIFT" then 
-				Key.BrickColor = BrickColor.new("Black") 
+			if Key.Name ~= "UPPERCASE" and Key.Name ~= "CTRL" then 
+				if Key:HasTag("CtrlPressed") then
+					Key.BrickColor = BrickColor.new("Electric blue")
+				else
+					if Key.Name ~= "SHIFT" then
+						Key.BrickColor = BrickColor.new("Black") 
+					end
+				end
 			end
 			
 			Key.Position = Vector3.new(Key.Position.X, Key.Position.Y + 0.5, Key.Position.Z)
@@ -172,6 +203,21 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 		
 		if not Key or not Key:IsA("BasePart") then
 			return
+		end
+
+		if use_ctrl then
+			local k = Key.Name:lower()
+			if k ~= "ctrl" and k ~= "uppercase" then 
+				if not current_ctrl_text then
+					current_ctrl_text = "ctrl" .. "+" .. Key.Name:lower()
+				else
+					current_ctrl_text = current_ctrl_text .. "+" .. Key.Name:lower()
+				end
+
+				table.insert(blue_keys, Key)
+				Key:AddTag("CtrlPressed")
+				return
+			end
 		end
 		
 		if Key.Name == "UPPERCASE" then
@@ -208,7 +254,7 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
       if not swap_table then return end
 
 			if use_shift then
-				for _, NewKey in ipairs(uppercase_keys) do
+				for _, NewKey in ipairs(shift_keys) do
 					if NewKey.Name == "SHIFT" then
 						if NewKey:IsA("BasePart") then
 							NewKey.BrickColor = BrickColor.new("Forest green")
@@ -230,6 +276,88 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 			return
 		end
 
+		if Key.Name == "CTRL" then
+			if use_ctrl then
+				use_ctrl = false
+
+				if current_ctrl_text then
+					EditUi("<" .. current_ctrl_text .. ">", playerWhoClicked, true)
+				end
+
+				if not record then
+					record = {} 
+				end
+				
+				if current_ctrl_text and start_time then
+					table.insert(record :: types.Recording, {
+						["Key"] = "<" .. current_ctrl_text :: string .. ">",
+						["Time"] = time() - start_time :: number
+					})
+				end
+
+				current_ctrl_text = nil
+
+				for _, BlueKey in ipairs(blue_keys) do
+					if BlueKey:IsA("BasePart") then
+						BlueKey:RemoveTag("CtrlPressed")
+						
+						if BlueKey.Name == "SHIFT" then
+							BlueKey.BrickColor = use_shift and BrickColor.new("Forest green") or BrickColor.new("Persimmon")
+						else
+							BlueKey.BrickColor = BrickColor.new("Black")
+						end
+
+						local ui = BlueKey:FindFirstChild("SurfaceGui")
+						if ui and ui:IsA("SurfaceGui") then
+							local tl = ui:FindFirstChild("TextLabel")
+							if tl and tl:IsA("TextLabel") then
+								tl.TextColor3 = Color3.new(1, 1, 1)
+							end
+						end
+
+						task.spawn(function()
+							BlueKey.Position = Vector3.new(BlueKey.Position.X, BlueKey.Position.Y - 0.5, BlueKey.Position.Z)
+							task.wait(0.2)
+							BlueKey.Position = Vector3.new(BlueKey.Position.X, BlueKey.Position.Y + 0.5, BlueKey.Position.Z)
+						end)
+					end
+				end
+
+				for _, CtrlKey in ipairs(ctrl_keys) do
+					if CtrlKey.Name == "CTRL" then
+						if CtrlKey:IsA("BasePart") then
+							CtrlKey.BrickColor = BrickColor.new("Smoky grey")
+						end
+					end
+				end
+
+				for _, RougeKey in ipairs(Collection:GetTagged("CtrlPressed")) do
+					if RougeKey:IsA("BasePart") then
+						RougeKey:RemoveTag("CtrlPressed")
+						RougeKey.BrickColor = BrickColor.new("Black")
+					end
+				end
+
+				blue_keys = {}
+
+				uiService:UpdateKeyGui(use_uppercase, use_shift, swap_table :: {[string]: string})
+			else
+
+				use_ctrl = true
+
+				for _, CtrlKey in ipairs(ctrl_keys) do
+					if CtrlKey.Name == "CTRL" then
+						if CtrlKey:IsA("BasePart") then
+							CtrlKey.BrickColor = BrickColor.new("Bright blue")
+						end
+					end
+				end
+				return
+			end
+
+			return
+		end
+	
 		local k: string = Key.Name
 		local temp_uppercase: boolean = use_shift
 
@@ -240,7 +368,9 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 		end
 
 		if IsUsingTypingUi and (not enabled or not recording) then
-			EditUi(if use_uppercase or use_shift or temp_uppercase then k:upper() else k:lower(), playerWhoClicked, true)
+			if (not use_ctrl) and k ~= "ctrl" then
+				EditUi(if use_uppercase or use_shift or temp_uppercase then k:upper() else k:lower(), playerWhoClicked, true)
+			end
 		end
 		
 		if not start_time then return end
@@ -257,7 +387,12 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 		});
 
 		if IsUsingTypingUi then
-			EditUi(if use_uppercase or use_shift then k:upper() else k:lower(), playerWhoClicked, false)
+			--if use_ctrl then
+				--EditUi("<" .. current_ctrl_text :: string .. ">", playerWhoClicked, false)
+			--else
+			if (not use_ctrl) and k:lower() ~= "ctrl" then
+				EditUi(if use_uppercase or use_shift then k:upper() else k:lower(), playerWhoClicked, false)
+			end
 		end
 	end)
 end
@@ -279,6 +414,10 @@ local function SetupKeys(keys: types.KeyList, playerUiName: string, playSoundEve
 			Key.Name = "UPPERCASE"
 		end
 
+		if Key.Name == "<ctrl>" then
+			Key.Name = "CTRL"
+		end
+
 		if Key.Name == "<shift>" then
 			Key.Name = "SHIFT"
 		end
@@ -291,6 +430,11 @@ local function SetupKeys(keys: types.KeyList, playerUiName: string, playSoundEve
 		if Key.Name == "SHIFT" then
 			Key.BrickColor = BrickColor.new("Persimmon")
 			table.insert(shift_keys, Key)
+		end
+
+		if Key.Name == "CTRL" then
+			Key.BrickColor = BrickColor.new("Smoky grey")
+			table.insert(ctrl_keys, Key)
 		end
 
     local tl = uiService:CreateKeyGui(Key)

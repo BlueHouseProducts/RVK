@@ -39,7 +39,7 @@ function uiModule:UpdateKeyGui(use_uppercase: boolean, use_shift: boolean, swap_
       
       if tl and ui:IsA("SurfaceGui") and tl:IsA("TextLabel") then
         local K = Key :: BasePart;
-        if K.Name == "SHIFT" or K.Name == "UPPERCASE" then continue end
+        if K.Name == "SHIFT" or K.Name == "UPPERCASE" or K.Name == "CTRL" then continue end
         
         if use_uppercase then
           if tl.Text:find("<") and tl.Text:find(">") then continue end

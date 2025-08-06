@@ -58,6 +58,7 @@ main:Start(KeyTag, PlaySoundInstance, NameOfPlayerUi, ShiftSwapTable, ToggleSwit
 -- Keys with Tag 'NoSwap' will not swap.
 -- All <caps lock> keys will be renamed to UPPERCASE keys on startup.
 -- All <shift> keys will be renamed to SHIFT keys on startup.
+-- All <ctrl> keys will be renamed to CTRL keys on startup.
 
 -- Extra Information
 -- Everything outside of these modules is optional
