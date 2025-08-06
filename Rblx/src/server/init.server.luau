@@ -56,6 +56,8 @@ main:Start(KeyTag, PlaySoundInstance, NameOfPlayerUi, ShiftSwapTable, ToggleSwit
 -- The ShiftSwapTable shows what keys will swap to what.
 -- Keys have the 'Key' tag
 -- Keys with Tag 'NoSwap' will not swap.
+-- All <caps lock> keys will be renamed to UPPERCASE keys on startup.
+-- All <shift> keys will be renamed to SHIFT keys on startup.
 
 -- Extra Information
 -- Everything outside of these modules is optional

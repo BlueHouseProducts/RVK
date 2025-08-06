@@ -32,6 +32,9 @@ local plruifr = require(script.Parent.plrui)
 local using_audio: boolean = false
 local audio_id: string? = nil
 
+local uppercase_keys: {BasePart} = {}
+local shift_keys: {BasePart} = {}
+
 local function EditUi(key: string, plr: Player, toGreyOut: boolean)		
 	if not TypingUi then
 		IsUsingTypingUi = false
@@ -175,9 +178,21 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 			use_uppercase = not use_uppercase
 
 			if use_uppercase then
-				Key.Color = Color3.new(0, 1, 0)
+				for _, NewKey in ipairs(uppercase_keys) do
+					if NewKey.Name == "UPPERCASE" then
+						if NewKey:IsA("BasePart") then
+							NewKey.Color = Color3.new(0, 1, 0)
+						end
+					end
+				end
 			else
-				Key.Color = Color3.new(1, 0, 0)
+				for _, NewKey in ipairs(uppercase_keys) do
+					if NewKey.Name == "UPPERCASE" then
+						if NewKey:IsA("BasePart") then
+							NewKey.Color = Color3.new(1, 0, 0)
+						end
+					end
+				end
 			end
 
       if not swap_table then return end
@@ -191,11 +206,23 @@ local function CreateKeyEvent(detector: ClickDetector, Key: BasePart, h: Highlig
 			use_shift = not use_shift
 
       if not swap_table then return end
-			
-			if use_shift then
-				Key.BrickColor = BrickColor.new("Forest green")
+
+			if use_uppercase then
+				for _, NewKey in ipairs(uppercase_keys) do
+					if NewKey.Name == "SHIFT" then
+						if NewKey:IsA("BasePart") then
+							NewKey.BrickColor = BrickColor.new("Forest green")
+						end
+					end
+				end
 			else
-				Key.BrickColor = BrickColor.new("Persimmon")
+				for _, NewKey in ipairs(shift_keys) do
+					if NewKey.Name == "SHIFT" then
+						if NewKey:IsA("BasePart") then
+							NewKey.BrickColor = BrickColor.new("Persimmon")
+						end
+					end
+				end
 			end
 			
 			uiService:UpdateKeyGui(use_uppercase, use_shift, swap_table :: {[string]: string})
@@ -240,6 +267,24 @@ local function SetupKeys(keys: types.KeyList, playerUiName: string, playSoundEve
 
     local detector = Instance.new("ClickDetector")
     detector.Parent = Key
+
+		if Key.Name == "<caps lock>" then
+			Key.Name = "UPPERCASE"
+		end
+
+		if Key.Name == "<shift>" then
+			Key.Name = "SHIFT"
+		end
+
+		if Key.Name == "UPPERCASE" then
+			Key.Color = Color3.new(1, 0, 0)
+			table.insert(uppercase_keys, Key)
+		end
+
+		if Key.Name == "SHIFT" then
+			Key.BrickColor = BrickColor.new("Persimmon")
+			table.insert(shift_keys, Key)
+		end
 
     local tl = uiService:CreateKeyGui(Key)
 
