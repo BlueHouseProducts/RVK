@@ -72,7 +72,11 @@ main:Start(KeyTag, PlaySoundInstance, NameOfPlayerUi, ShiftSwapTable, ToggleSwit
 -- local editables: types.Editable = {
 -- 	["UseTypeSpeedDivision"] = {
 --		["Enabled"] = true,
---		["DivisionSpeed"] = 3
+--		["DivisionSpeed"] = 3,
+--  },
+--  ["Debug"] = true, -- enables debug messages (lua only with SendPerKey, lua and python with SendOrdered \/)
+--  ["Delay"] = 0, -- delay before sending each key (in seconds)
+--  ["HTTPSendType"] = "SendPerKey" -- SendPerKey sends each key to python at time to press, SendOrdered sends all keys to python which uses time to order them
 -- 	}
 -- } -- makes your resulting typing speed faster by dividing all wait times by 3
 -- http:SetupEditables(editables)

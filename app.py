@@ -3,7 +3,8 @@
 # https://github.com/BlueHouseProducts/RVK/
 # License: https://github.com/BlueHouseProducts/RVK/blob/main/LICENSE
 
-from flask import Flask, request
+from time import sleep
+from flask import Flask, jsonify, request
 import keyboard
 
 import re
@@ -27,6 +28,7 @@ def send_mixed_input(s):
         else:
             keyboard.write(token)
 
+# Use for 1 key press at a time, v1, lua manages time
 @app.post("/useKey")
 def KeyUsage():
   req = request.get_json()
@@ -39,5 +41,38 @@ def KeyUsage():
   send_mixed_input(key)
 
   return '{"result": true}'
+
+# Use for specific key presses in order, v2, python manages time
+@app.post("/useOrdered")
+def OrderedKeyUsage():
+  req = request.get_json()
+
+  if req["req"] != "PressKeysOrdered":
+    return '{"result": false}'
+  
+  keys = req["Keys"]
+  debug = req.get("Debug", False)
+
+  if debug: print(keys)
+
+  current_index = 1 # Remember Lua indexes start at 1!!
+  current_time = 0
+  for key in keys:
+    if current_index != key["Index"]:
+      if debug: print("Keys are not ordered correctly")
+      return jsonify(result=False, error="Keys are not ordered correctly")
+    
+    if debug: print("Starting key " + str(key["Index"]) + " at time " + str(current_time) + " with key " + key["Key"])
+    send_mixed_input(key["Key"])
+    
+    wait_time = key["Time"] - current_time
+    if debug: print("Waiting for " + str(wait_time) + " seconds")
+    
+    sleep(wait_time)
+    current_time = key["Time"]
+    current_index += 1
+
+  return jsonify(result=True)
+
 
 app.run()

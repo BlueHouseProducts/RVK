@@ -26,7 +26,8 @@ local Editables: types.Editable = {
 		["Enabled"] = false
 	},
   ["Debug"] = false,
-  ["Delay"] = 2
+  ["Delay"] = 2,
+  ["HTTPSendType"] = "SendOrdered"
 }
 
 local function AttemptHTTP(data: string)
@@ -41,6 +42,23 @@ local function AttemptHTTP(data: string)
 
   if not success then
     warn("Failed to send: " .. tostring(res))
+  end
+
+  return success
+end
+
+local function AttemptHTTPOrdered(data: string)
+  if Editables.Debug then
+    print("Sending ordered: " .. data)
+  end
+  
+  local success, res = pcall(function()  
+    httpService:PostAsync(url .. "useOrdered", data, Enum.HttpContentType.ApplicationJson, false)
+    return true
+  end)
+
+  if not success then
+    warn("Failed to send ordered: " .. tostring(res))
   end
 
   return success
@@ -70,22 +88,48 @@ function module:Start(recording: types.Recording, given_url: string)
     print("Delay: " .. tostring(delay))
     print("Recording: #" .. tostring(#recording), recording)
     print("Editables: ", Editables)
+    print("Using Send type", Editables.HTTPSendType)
   end
   
   url = given_url
 
   task.wait(Editables.Delay or 0)
   
-  for i, record in pairs(recording) do
-    task.spawn(function() 
-      local res = RecordHolder(record)
+  if Editables.HTTPSendType == "SendPerKey" then
+    -- v1
+    for i, record in pairs(recording) do
+      task.spawn(function() 
+        local res = RecordHolder(record)
 
-      if not res then
-        warn("1 key failed to send! || Key number " .. tostring(i))
-        warn("Key: " .. record.Key .. " at " .. tostring(record.Time))
-        warn("-----------------------------------")
-      end
-    end)
+        if not res then
+          warn("1 key failed to send! || Key number " .. tostring(i))
+          warn("Key: " .. record.Key .. " at " .. tostring(record.Time))
+          warn("-----------------------------------")
+        end
+      end)
+    end
+  elseif Editables.HTTPSendType == "SendOrdered" then
+    -- v2
+    local div = Editables.UseTypeSpeedDivision.Enabled and Editables.UseTypeSpeedDivision.DivisionSpeed or 1
+    local debug = Editables.Debug
+    
+    local ordered = {
+      ["Keys"] = {},
+      ["req"] = "PressKeysOrdered",
+      ["Debug"] = debug
+    }
+
+    task.wait(Editables.Delay or 0)
+
+    for i, record in ipairs(recording) do
+      table.insert(ordered["Keys"], {
+        ["Key"] = record.Key,
+        ["Time"] = record.Time / div,
+        ["Index"] = i
+      })
+    end
+
+    AttemptHTTPOrdered(httpService:JSONEncode(ordered))
   end
 end
 
