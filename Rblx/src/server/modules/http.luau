@@ -89,6 +89,7 @@ function module:Start(recording: types.Recording, given_url: string)
     print("Recording: #" .. tostring(#recording), recording)
     print("Editables: ", Editables)
     print("Using Send type", Editables.HTTPSendType)
+    print("Delay: " .. tostring(Editables.Delay))
   end
   
   url = given_url
