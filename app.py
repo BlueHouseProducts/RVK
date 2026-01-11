@@ -45,9 +45,13 @@ def KeyUsage():
 # Use for specific key presses in order, v2, python manages time
 @app.post("/useOrdered")
 def OrderedKeyUsage():
-  if debug: print("Validating useOredered request...")
   req = request.get_json()
+
+  keys = req["Keys"]
+  debug = req.get("Debug", False)
+
   if debug: print("Request:\n", req)
+  if debug: print("Validating useOredered request...")
 
   if req["req"] != "PressKeysOrdered":
     if debug: print("Request `req` field not PressKeysOrdered, closing...")
@@ -55,9 +59,6 @@ def OrderedKeyUsage():
   
   if debug: print("[Validated.]")
   if debug: print("Starting key group...")
-
-  keys = req["Keys"]
-  debug = req.get("Debug", False)
 
   if debug: print(keys)
 
