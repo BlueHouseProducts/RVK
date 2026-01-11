@@ -76,7 +76,7 @@ local function RunHTTP(key: string): boolean
 end
 
 local function RecordHolder(record: types.Record)
-  local realTime = if Editables.UseTypeSpeedDivision.Enabled then record.Time / Editables.UseTypeSpeedDivision.DivisionSpeed else record.Time
+  local realTime = if Editables.UseTypeSpeedDivision and Editables.UseTypeSpeedDivision.Enabled then record.Time / Editables.UseTypeSpeedDivision.DivisionSpeed else record.Time
   
   task.wait(realTime)
   return RunHTTP(record.Key)
@@ -85,7 +85,6 @@ end
 function module:Start(recording: types.Recording, given_url: string)
   if Editables.Debug then
     print("Starting HTTP module with URL: " .. tostring(given_url))
-    print("Delay: " .. tostring(delay))
     print("Recording: #" .. tostring(#recording), recording)
     print("Editables: ", Editables)
     print("Using Send type", Editables.HTTPSendType)
@@ -111,7 +110,7 @@ function module:Start(recording: types.Recording, given_url: string)
     end
   elseif Editables.HTTPSendType == "SendOrdered" then
     -- v2
-    local div = Editables.UseTypeSpeedDivision.Enabled and Editables.UseTypeSpeedDivision.DivisionSpeed or 1
+    local div = Editables.UseTypeSpeedDivision and Editables.UseTypeSpeedDivision.Enabled and Editables.UseTypeSpeedDivision.DivisionSpeed or 1
     local debug = Editables.Debug
     
     local ordered = {
@@ -149,6 +148,23 @@ function module:Test(given_url: string): boolean
 end
 
 function module:SetupEditables(editables: types.Editable)
+  if not editables.HTTPSendType then
+    editables.HTTPSendType = Editables.HTTPSendType
+  end
+
+  if not editables.Debug then
+    editables.Debug = Editables.Debug
+  end
+
+  if not editables.UseTypeSpeedDivision then
+    editables.UseTypeSpeedDivision = Editables.UseTypeSpeedDivision
+  end
+
+  if not editables.Delay then
+    editables.Delay = Editables.Delay
+  end
+
+  
   Editables = editables
 end
 
