@@ -16,17 +16,17 @@ def Online_Root():
   return "READY"
 
 def send_mixed_input(s):
-    tokens = re.split(r'(<[^>]+>)', s)
+  tokens = re.split(r'(<[^>]+>)', s)
 
-    for token in tokens:
-        if token.startswith('<') and token.endswith('>'):
-            key_name = token[1:-1].lower()
-            try:
-                keyboard.press_and_release(key_name)
-            except:
-                print(f"{key_name}")
-        else:
-            keyboard.write(token)
+  for token in tokens:
+    if token.startswith('<') and token.endswith('>'):
+      key_name = token[1:-1].lower()
+      try:
+        keyboard.press_and_release(key_name)
+      except:
+        print(f"{key_name}")
+    else:
+      keyboard.write(token)
 
 # Use for 1 key press at a time, v1, lua manages time
 @app.post("/useKey")
