@@ -26,11 +26,11 @@ type UseTypeSpeedDivision = {
 
 
 export type Editable = {
-  ["UseTypeSpeedDivision"]: UseTypeSpeedDivision,
+  ["UseTypeSpeedDivision"]: UseTypeSpeedDivision?,
   ["Debug"]: boolean?,
   ["Delay"]: number?,
 
-  ["HTTPSendType"]: "SendPerKey" | "SendOrdered"  -- SendOrdered sends all keys to python which uses time to order them, SendPerKey sends each key to python at time to press
+  ["HTTPSendType"]: "SendPerKey" | "SendOrdered"?  -- SendOrdered sends all keys to python which uses time to order them, SendPerKey sends each key to python at time to press
 }                                                 -- SendOrdered is more reliable, but SendPerKey is faster. We recommend SendOrdered.
 
 export type HTTPSendData = {
