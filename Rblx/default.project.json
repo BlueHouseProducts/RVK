@@ -9,14 +9,6 @@
       }
     },
 
-    "StarterPlayer": {
-      "StarterPlayerScripts": {
-        "Client": {
-          "$path": "src/client"
-        }
-      }
-    },
-
     "ReplicatedStorage": {
       "$path": "src/shared",
       "PlaySound": {

@@ -13,7 +13,7 @@ local NameOfPlayerUi: string = "PlayerUi" -- Name of created PlayerUi (what play
 local ToggleSwitch: BasePart = workspace.Main.keyboard.Switch -- points to the start/stop recording switch part.
 local KeySoundId: string? = "rbxassetid://18998603679" -- key sound when pressed. leave blank for no sound
 
-local HostUrl: string = "http://localhost:5000/" -- server url: include a / at the end, point it to the root of the site, not a page.
+local HostUrl: string = "http://localhost:5000/" -- python server url: include a / at the end, point it to the root of the site, not a page.
 
 local ShiftSwapTable: {[string]: string} = {
 	["1"] = "!",
